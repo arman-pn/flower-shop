@@ -53,13 +53,32 @@
   }
 
   /* تصویر محصول: عکس بارگذاری‌شده یا نقاشی */
+  /* عکس واقعی از photos.js (اگر در تنظیمات خاموش نشده و قبلاً خطا نداده باشد) */
+  function photoOf(id) {
+    var p = (window.PHOTOS || {})[id];
+    if (!p || p.bad || !p.src || DB.load().settings.usePhotos === false) return '';
+    return /^https?:/.test(p.src) ? p.src + (window.PHOTO_QUERY || '') : p.src;
+  }
+  function photoTag(kind, item) {
+    return '<img class="photo" src="' + esc(photoOf(item.id)) + '" alt="' + esc(item.name) + '" loading="lazy" onerror="UI.photoFail(this,\'' + kind + '\',\'' + item.id + '\')">';
+  }
+  // اگر عکس بار نشد (اینترنت قطع است یا نشانی خراب است) همان نقاشی جایش می‌نشیند
+  function photoFail(el, kind, id) {
+    if (window.PHOTOS && window.PHOTOS[id]) window.PHOTOS[id].bad = true;
+    var item = kind === 'b' ? Q.bouquet(id) : Q.flower(id);
+    if (!item || !el.parentNode) return;
+    el.outerHTML = kind === 'b' ? artBouquet(item, { max: 14 }) : artFlower(item);
+  }
+  function hasPhoto(item) { return !!(item.img || photoOf(item.id)); }
   function artBouquet(b, o) {
     if (b.img) return '<img class="photo" src="' + esc(b.img) + '" alt="' + esc(b.name) + '" loading="lazy">';
+    if (photoOf(b.id)) return photoTag('b', b);
     o = o || {};
     return Flora.bouquet(Q.bouquetItems(b), { seed: b.id, wrap: b.wrap, label: b.name, animate: o.animate, max: o.max, bare: o.bare });
   }
   function artFlower(f) {
     if (f.img) return '<img class="photo" src="' + esc(f.img) + '" alt="' + esc(f.name) + '" loading="lazy">';
+    if (photoOf(f.id)) return photoTag('f', f);
     return Flora.single(f);
   }
   // کاشی پس‌زمینه‌ی هر محصول یکی از سه گرادیان تم است (در style.css: --tile-1 تا --tile-3)
@@ -84,5 +103,5 @@
     fr.readAsDataURL(file);
   }
 
-  window.UI = { esc: esc, ic: ic, toast: toast, artBouquet: artBouquet, artFlower: artFlower, bgB: bgB, bgF: bgF, tile: tile, readImage: readImage };
+  window.UI = { esc: esc, ic: ic, toast: toast, artBouquet: artBouquet, artFlower: artFlower, bgB: bgB, bgF: bgF, tile: tile, photoFail: photoFail, hasPhoto: hasPhoto, readImage: readImage };
 })();

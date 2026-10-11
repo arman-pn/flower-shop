@@ -260,7 +260,7 @@
     var rel = activeB().filter(function (x) { return x.id !== b.id && x.cats.some(function (c) { return b.cats.indexOf(c) > -1; }); }).slice(0, 4);
     var total = its.reduce(function (n, i) { return n + i.n; }, 0), sd = sameDay();
     return '<div class="wrap"><div class="page-h">' + crumbs([['دسته‌گل‌ها', '#/shop'], [b.name]]) + '</div><div class="pd">' +
-      '<div class="pd-art" style="background:' + UI.bgB(b) + '">' + UI.artBouquet(b, { animate: true }) + (b.img ? '' : '<div class="stage-orbit pd-orbit" aria-hidden="true">' + its.slice(0, 3).map(function (i) { return '<span class="orb">' + Flora.single(i.f, { bare: true }) + '</span>'; }).join('') + '</div>') + '</div><div class="pd-info">' +
+      '<div class="pd-art" style="background:' + UI.bgB(b) + '">' + UI.artBouquet(b, { animate: true }) + (UI.hasPhoto(b) ? '' : '<div class="stage-orbit pd-orbit" aria-hidden="true">' + its.slice(0, 3).map(function (i) { return '<span class="orb">' + Flora.single(i.f, { bare: true }) + '</span>'; }).join('') + '</div>') + '</div><div class="pd-info">' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' + b.cats.map(function (c) { var o = Q.cat(c); return o ? '<a class="pill" href="#/shop/occ/' + o.id + '">' + esc(o.name) + '</a>' : ''; }).join('') + '</div>' +
       '<h1>' + esc(b.name) + '</h1>' + (rt ? '<a href="#reviews" data-act="scroll" data-to="reviews">' + stars(rt) + '</a>' : '') + '<p style="font-size:16px;color:var(--muted)">' + esc(b.desc) + '</p>' +
       '<div class="pd-price" id="pd-price">' + pdPrice(b) + '</div>' +
@@ -359,6 +359,10 @@
       ['اگر گیرنده خانه نبود چه می‌شود؟', 'پیک با گیرنده تماس می‌گیرد. اگر پاسخ نداد با خود شما هماهنگ می‌کنیم و گل را به نگهبان یا همسایه نمی‌سپاریم مگر شما بگویید.'],
       ['گل‌ها چند روز می‌مانند؟', 'بسته به نوع گل، ۴ تا ۱۴ روز. اگر دسته‌گلی زودتر از هفت روز پژمرد عکسش را بفرستید؛ دوباره می‌فرستیم.'],
       ['برای مراسم و عروسی هم گل‌آرایی می‌کنید؟', 'بله. با شماره‌ی فروشگاه تماس بگیرید تا برای بازدید از سالن وقت بگذاریم.']].map(function (q) { return '<details class="acc"><summary>' + q[0] + '</summary><div>' + q[1] + '</div></details>'; }).join('') +
+      (function () { // نام عکاس‌ها، اگر عکس واقعی روشن باشد
+        var names = {}, P = window.PHOTOS || {}; Object.keys(P).forEach(function (k) { if (P[k].by) names[P[k].by] = 1; }); names = Object.keys(names);
+        return names.length && s.usePhotos !== false ? '<details class="acc"><summary>عکس‌ها از کجاست؟</summary><div><p>عکس گل‌ها و دسته‌گل‌ها از سایت Unsplash و با مجوز رایگان آن است. عکاس‌ها: <span dir="ltr">' + esc(names.join(', ')) + '</span></p></div></details>' : '';
+      })() +
       '</div><div class="box"><div class="map">' + map + '</div><h3>هزینه‌ی ارسال در شیراز</h3>' + s.zones.map(function (z) { return '<div class="sum-row"><span>' + esc(z.name) + '</span><b class="num">' + (z.fee ? fmt(z.fee) + ' تومان' : 'رایگان') + '</b></div>'; }).join('') +
       '<p style="color:var(--muted);font-size:13.5px">خرید بالای ' + fmt(s.freeMin) + ' تومان در همه‌ی محله‌ها رایگان ارسال می‌شود.</p></div></div></div>';
   }
